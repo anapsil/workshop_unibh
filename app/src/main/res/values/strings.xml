@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Workshop UNIBH</string>
+    <string name="share_picture">Share picture</string>
+    <string name="take_picture">take picture</string>
 </resources>
