@@ -14,21 +14,23 @@ import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.ShareActionProvider
 import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 const val CAMERA_REQUEST = 1888
-const val CAMERA_PERMISSION_CODE = 100
+const val PERMISSION_CODE = 100
 
 class MainActivity : AppCompatActivity() {
+    val pictureFileName by lazy { generatePictureFileName() }
+    val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     var shareActionProvider: ShareActionProvider? = null
+    var imagePath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        takePicture.setOnClickListener { _ -> checkCameraPermission() }
+        takePicture.setOnClickListener { _ -> checkPermissions() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -37,20 +39,12 @@ class MainActivity : AppCompatActivity() {
 
         shareActionProvider = MenuItemCompat.getActionProvider(menuItem) as ShareActionProvider
 
-        shareActionProvider?.setShareIntent(getShareIntent())
         return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.action_share -> sharePicture()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_CODE) {
+        if (requestCode == PERMISSION_CODE) {
             if (grantResults[0] == PERMISSION_GRANTED) {
                 takePicture()
             } else {
@@ -63,12 +57,13 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             val photo = data?.extras?.get("data") as Bitmap
             picture.setImageBitmap(photo)
+            getShareIntent()
         }
     }
 
-    private fun checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
+    private fun checkPermissions() {
+        if (!arePermissionsGranted()) {
+            ActivityCompat.requestPermissions(this, permissions, PERMISSION_CODE)
         } else {
             takePicture()
         }
@@ -79,15 +74,28 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(cameraIntent, CAMERA_REQUEST)
     }
 
-    private fun sharePicture() {
-        Toast.makeText(this, R.string.share_picture, Toast.LENGTH_SHORT).show()
+    private fun arePermissionsGranted(): Boolean {
+        permissions.iterator().forEach {
+            if (ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED) {
+                return false
+            }
+        }
+        return true
     }
+//    private fun sharePicture() {
+//        Toast.makeText(this, R.string.share_picture, Toast.LENGTH_SHORT).show()
+//    }
 
-    private fun getShareIntent(): Intent {
+    private fun getShareIntent() {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "image/*"
 //        myShareIntent.putExtra(Intent.EXTRA_STREAM, myImageUri)
-        return shareIntent
+        shareActionProvider?.setShareIntent(shareIntent)
+    }
+
+
+    private fun generatePictureFileName(): String {
+        return "img_".plus(Calendar.getInstance().timeInMillis).plus(".jpg")
     }
 
     private fun showPermissionDeniedMessage() {
