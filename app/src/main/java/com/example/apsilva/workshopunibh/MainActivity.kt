@@ -5,26 +5,30 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.support.v4.view.MenuItemCompat
+import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.ShareActionProvider
+import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 import java.util.*
 
 const val CAMERA_REQUEST = 1888
 const val PERMISSION_CODE = 100
+const val APP_TAG = "Workshop_unibh"
 
 class MainActivity : AppCompatActivity() {
-    val pictureFileName by lazy { generatePictureFileName() }
-    val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    var shareActionProvider: ShareActionProvider? = null
-    var imagePath: String? = null
+    private val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    private var imagePath: File? = null
+    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,11 +39,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_share, menu)
-        val menuItem = menu?.findItem(R.id.action_share)
-
-        shareActionProvider = MenuItemCompat.getActionProvider(menuItem) as ShareActionProvider
-
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        sharePicture()
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -55,9 +60,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            val photo = data?.extras?.get("data") as Bitmap
-            picture.setImageBitmap(photo)
-            getShareIntent()
+            val takenImage = BitmapFactory.decodeFile(imagePath?.absolutePath)
+            picture.setImageBitmap(takenImage)
         }
     }
 
@@ -70,8 +74,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun takePicture() {
+        imagePath = getPhotoFileUri()
+        Log.i(APP_TAG, imagePath.toString())
+        imageUri = FileProvider.getUriForFile(this, "com.example.apsilva.workshopunibh.fileprovider", imagePath!!)
+        Log.i(APP_TAG, imageUri.toString())
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
         startActivityForResult(cameraIntent, CAMERA_REQUEST)
+    }
+
+    private fun getPhotoFileUri(): File {
+        val mediaStorageDir = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG)
+
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
+            Log.d(APP_TAG, "failed to create directory")
+        }
+
+        return File(mediaStorageDir.path + File.separator + generatePictureFileName())
     }
 
     private fun arePermissionsGranted(): Boolean {
@@ -82,15 +101,13 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
-//    private fun sharePicture() {
-//        Toast.makeText(this, R.string.share_picture, Toast.LENGTH_SHORT).show()
-//    }
 
-    private fun getShareIntent() {
+    private fun sharePicture() {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "image/*"
-//        myShareIntent.putExtra(Intent.EXTRA_STREAM, myImageUri)
-        shareActionProvider?.setShareIntent(shareIntent)
+        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri)
+
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_photo)))
     }
 
 
