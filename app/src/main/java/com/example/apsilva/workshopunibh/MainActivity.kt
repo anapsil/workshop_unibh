@@ -7,16 +7,20 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
@@ -26,7 +30,6 @@ const val PERMISSION_CODE = 100
 const val APP_TAG = "Workshop_unibh"
 
 class MainActivity : AppCompatActivity() {
-    private val permissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private var imagePath: File? = null
     private var imageUri: Uri? = null
 
@@ -43,11 +46,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        sharePicture()
+        if (isPictureCaptured()) {
+            sharePicture()
+        }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_CODE) {
             if (grantResults[0] == PERMISSION_GRANTED) {
@@ -66,8 +72,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        if (!arePermissionsGranted()) {
-            ActivityCompat.requestPermissions(this, permissions, PERMISSION_CODE)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.CAMERA), PERMISSION_CODE)
         } else {
             takePicture()
         }
@@ -75,9 +83,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun takePicture() {
         imagePath = getPhotoFileUri()
-        Log.i(APP_TAG, imagePath.toString())
-        imageUri = FileProvider.getUriForFile(this, "com.example.apsilva.workshopunibh.fileprovider", imagePath!!)
-        Log.i(APP_TAG, imageUri.toString())
+        imageUri = FileProvider.getUriForFile(this,
+                "com.example.apsilva.workshopunibh.fileprovider", imagePath!!)
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
         startActivityForResult(cameraIntent, CAMERA_REQUEST)
@@ -93,24 +100,26 @@ class MainActivity : AppCompatActivity() {
         return File(mediaStorageDir.path + File.separator + generatePictureFileName())
     }
 
-    private fun arePermissionsGranted(): Boolean {
-        permissions.iterator().forEach {
-            if (ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED) {
-                return false
-            }
+    private fun sharePicture() {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "image/*"
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://$imagePath"))
+        } else {
+            shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri)
         }
-        return true
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_photo)))
+
     }
 
-    private fun sharePicture() {
-        val file = File(imagePath, "")
-        if(file.exists()) {
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.type = "image/*"
-            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://$imagePath"))
-
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_photo)))
+    private fun isPictureCaptured(): Boolean {
+        if (imagePath != null) {
+            return true
         }
+        Toast.makeText(this, getString(R.string.take_photo_required),
+                Toast.LENGTH_LONG).show()
+        return false
     }
 
 
@@ -119,6 +128,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPermissionDeniedMessage() {
-
+        Toast.makeText(this, getString(R.string.permission_denied),
+                Toast.LENGTH_LONG).show()
     }
 }

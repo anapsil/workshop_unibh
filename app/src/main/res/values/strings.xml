@@ -2,5 +2,7 @@
     <string name="app_name">Workshop UNIBH</string>
     <string name="share_picture">Share picture</string>
     <string name="take_picture">take picture</string>
-    <string name="share_photo">Compartilhar Foto</string>
+    <string name="share_photo">Share Picture</string>
+    <string name="take_photo_required">Please take the picture</string>
+    <string name="permission_denied">Required permission</string>
 </resources>

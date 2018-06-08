@@ -48,13 +48,13 @@ class CursorCompatWrapper : CursorWrapper{
         fakeDataColumn = if (cursor.getColumnIndex(MediaStore.MediaColumns.DATA) >= 0) {
             -1
         } else {
-            cursor.getColumnCount()
+            cursor.columnCount
         }
 
         fakeMimeTypeColumn = if (cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE) >= 0) {
             -1
         } else if (fakeDataColumn == -1) {
-            cursor.getColumnCount()
+            cursor.columnCount
         } else {
             fakeDataColumn + 1
         }
