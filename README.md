@@ -19,7 +19,7 @@ Import project (Gradle, Eclipse ADT, etc.)
 
 ### O AndroidManifest.xml
 
-Todo aplicativo tem que ter um arquivo AndroidManifest.xml (precisamente com esse nome) 
+Todo aplicativo tem que ter um arquivo `AndroidManifest.xml` (precisamente com esse nome) 
 no diretório raiz. 
 
 O arquivo de manifesto apresenta informações essenciais 
@@ -48,7 +48,7 @@ para interagir com os componentes do aplicativo.
 </manifest>
 ```
 
-Adicione as seguintes permissões no arquivo AndroidManifest.xml do projeto:
+Adicione as seguintes permissões no arquivo `AndroidManifest.xml` do projeto:
 
 ```
     <uses-permission android:name="android.permission.INTERNET" />
@@ -59,14 +59,39 @@ Adicione as seguintes permissões no arquivo AndroidManifest.xml do projeto:
 
 ### Verificando as permissões
 
+Se o aparelho roda com Android 6.0 (API 23) ou superior e `targetSdkVersion` do aplicativo é igual 
+ou superior a 23, o usuário não é notificado de nenhuma permissão no momento
+da instalação. O aplicativo deve questionar o usuário sobre as [permissões perigosas](https://developer.android.com/guide/topics/permissions/overview?hl=pt-br#permission-groups)
+em tempo de execução.
 
+No projeto, abra a classe `MainActivity.kt` e adicione o trecho de código abaixo:
+
+```
+
+
+```
 
 ### Configurando do File Provider
 
 
+```
+
+
+```
 
 ### Tirando uma foto
 
 
+```
+
+
+```
 
 ### Compartilhando a foto
+
+
+```
+
+
+```
+
