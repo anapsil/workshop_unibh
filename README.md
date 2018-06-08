@@ -35,17 +35,17 @@ e interagir com outros aplicativos. Ele também declara as permissões que outro
 para interagir com os componentes do aplicativo.
 
 ```
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.apsilva.workshopunibh">
-
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme" />
-</manifest>
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="com.example.apsilva.workshopunibh">
+    
+        <application
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme" />
+    </manifest>
 ```
 
 Adicione as seguintes permissões no arquivo `AndroidManifest.xml` do projeto:
@@ -53,8 +53,6 @@ Adicione as seguintes permissões no arquivo `AndroidManifest.xml` do projeto:
 ```
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 ```
 
 ### Verificando as permissões
