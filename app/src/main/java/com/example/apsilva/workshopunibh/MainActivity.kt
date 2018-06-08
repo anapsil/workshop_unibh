@@ -103,11 +103,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sharePicture() {
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.type = "image/*"
-        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri)
+        val file = File(imagePath, "")
+        if(file.exists()) {
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "image/*"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://$imagePath"))
 
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_photo)))
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_photo)))
+        }
     }
 
 
