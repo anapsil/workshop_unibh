@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        takePicture.setOnClickListener { _ -> checkPermissions() }
+        takePictureButton.setOnClickListener { _ -> checkPermissions() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
