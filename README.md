@@ -55,6 +55,17 @@ Adicione as seguintes permissões no arquivo `AndroidManifest.xml` do projeto:
     <uses-permission android:name="android.permission.CAMERA" />
 ```
 
+Registre a `MainActivity.kt`
+
+```
+    <activity android:name=".MainActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+```
+
 ### Verificando as permissões
 
 Se o aparelho roda com Android 6.0 (API 23) ou superior e `targetSdkVersion` do aplicativo é igual 
@@ -93,6 +104,19 @@ No projeto, abra a classe `MainActivity.kt` e adicione os trechos de código aba
 
 ### Configurando do File Provider
 
+No diretório de recursos, crie a pasta `xml` e o arquivo `fileprovider.xml`.
+
+Adicione no arquivo criado, o conteúdo abaixo:
+
+```
+    <?xml version="1.0" encoding="utf-8"?>
+    <paths>
+        <external-files-path name="images" path="Pictures" />
+    </paths>
+
+```
+
+No `AndroidManifest.xml` registre o file provider
 
 ```
    <provider
@@ -106,21 +130,11 @@ No projeto, abra a classe `MainActivity.kt` e adicione os trechos de código aba
    </provider>
 
 ```
-No diretório de recursos, crie a pasta `xml` e o arquivo `fileprovider.xml`.
-
-Adicione no arquivo criado, o conteúdo abaixo:
-
-```
-    <?xml version="1.0" encoding="utf-8"?>
-    <paths>
-        <external-files-path name="images" path="Pictures" />
-    </paths>
-
-```
 
 ### Tirando uma foto
 
 Volte para a classe `MainActivity.kt` e inclua os trechos abaixo:
+
 ```
     private fun takePicture() {
         imagePath = getPhotoFileUri()
@@ -143,7 +157,6 @@ Volte para a classe `MainActivity.kt` e inclua os trechos abaixo:
 ```
 
 ### Compartilhando a foto
-
 
 ```
     private fun sharePicture() {
