@@ -7,20 +7,19 @@ import android.provider.MediaStore
 import java.util.Arrays
 
 
-class CursorCompatWrapper : CursorWrapper(){
+class CursorCompatWrapper : CursorWrapper{
     private var fakeDataColumn: Int = 0
     private var fakeMimeTypeColumn: Int = 0
-    private val mimeType: String? = null
-    private val uriForDataColumn: Uri? = null
+    private var mimeType: String? = null
+    private var uriForDataColumn: Uri? = null
 
     /**
      * Constructor.
      *
      * @param cursor the Cursor to be wrapped
      */
-    constructor(cursor: Cursor) {
-        this(cursor, null)
-    }
+
+    constructor(cursor: Cursor): this(cursor, null)
 
     /**
      * Constructor.
@@ -30,9 +29,7 @@ class CursorCompatWrapper : CursorWrapper(){
      * by the Uri that generated this Cursor, should
      * we need it
      */
-    fun LegacyCompatCursorWrapper(cursor: Cursor, mimeType: String?): ??? {
-        this(cursor, mimeType, null)
-    }
+    constructor(cursor: Cursor, mimeType: String?): this(cursor, mimeType, null)
 
     /**
      * Constructor.
@@ -43,24 +40,23 @@ class CursorCompatWrapper : CursorWrapper(){
      * we need it
      * @param uriForDataColumn Uri to return for the _DATA column
      */
-    fun LegacyCompatCursorWrapper(cursor: Cursor, mimeType: String?,
-                                  uriForDataColumn: Uri?): ??? {
-        super(cursor)
+    constructor(cursor: Cursor, mimeType: String?,
+                                  uriForDataColumn: Uri?): super(cursor) {
 
         this.uriForDataColumn = uriForDataColumn
 
-        if (cursor.getColumnIndex(MediaStore.MediaColumns.DATA) >= 0) {
-            fakeDataColumn = -1
+        fakeDataColumn = if (cursor.getColumnIndex(MediaStore.MediaColumns.DATA) >= 0) {
+            -1
         } else {
-            fakeDataColumn = cursor.getColumnCount()
+            cursor.getColumnCount()
         }
 
-        if (cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE) >= 0) {
-            fakeMimeTypeColumn = -1
+        fakeMimeTypeColumn = if (cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE) >= 0) {
+            -1
         } else if (fakeDataColumn == -1) {
-            fakeMimeTypeColumn = cursor.getColumnCount()
+            cursor.getColumnCount()
         } else {
-            fakeMimeTypeColumn = fakeDataColumn + 1
+            fakeDataColumn + 1
         }
 
         this.mimeType = mimeType

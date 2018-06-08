@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="FileProviderCompat"
             android:authorities="com.example.apsilva.workshopunibh.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
