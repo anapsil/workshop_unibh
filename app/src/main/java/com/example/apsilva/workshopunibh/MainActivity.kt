@@ -1,4 +1,4 @@
-package com.example.apsilva
+package com.example.apsilva.workshopunibh
 
 import android.content.Intent
 import android.net.Uri
@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.example.apsilva.workshopunibh.R
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
