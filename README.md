@@ -104,6 +104,11 @@ No projeto, abra a classe `MainActivity.kt` e adicione os trechos de código aba
 
 ### Configurando do File Provider
 
+O FileProvider é a maneira segura de compartilhar arquivos entre aplicações
+no Android criando uma `Uri` de conteúdo `content://`.
+
+A `Uri` de conteúdo garante acesso temporário de leitura e escrita .
+
 No diretório de recursos, crie a pasta `xml` e o arquivo `fileprovider.xml`.
 
 Adicione no arquivo criado, o conteúdo abaixo:
@@ -157,6 +162,8 @@ Volte para a classe `MainActivity.kt` e inclua os trechos abaixo:
 ```
 
 ### Compartilhando a foto
+
+Ainda na `MainActivity.kt`, adicione o código do método `sharePicture()`
 
 ```
     private fun sharePicture() {
